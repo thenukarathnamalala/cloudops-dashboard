@@ -3,6 +3,7 @@ import {
   createApplication,
   getApplications,
   getApplicationById,
+  deleteApplication,
 } from "../services/application.service";
 
 export const getAllApplications = (_req: Request, res: Response): void => {
@@ -38,5 +39,22 @@ export const addApplication = (req: Request, res: Response): void => {
     status: "success",
     message: "Application created successfully",
     data: application,
+  });
+};
+
+export const removeApplication = (req: Request<{ id: string }>, res: Response): void => {
+  const deleted = deleteApplication(req.params.id);
+
+  if (!deleted) {
+    res.status(404).json({
+      status: "error",
+      message: "Application not found",
+    });
+    return;
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "Application deleted successfully",
   });
 };

@@ -36,3 +36,15 @@ export const createApplication = (input: CreateApplicationInput): Application =>
 
   return newApplication;
 };
+
+export const deleteApplication = (id: string): boolean => {
+  const applicationIndex = applications.findIndex((application) => application.id === id);
+
+  if (applicationIndex === -1) {
+    return false;
+  }
+
+  applications.splice(applicationIndex, 1);
+
+  return true;
+};
