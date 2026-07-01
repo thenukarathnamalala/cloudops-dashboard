@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { Application } from "../types/application";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const getApplications = async (): Promise<Application[]> => {
   const response = await axios.get(`${API_URL}/applications`);
