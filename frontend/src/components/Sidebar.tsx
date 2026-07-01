@@ -52,18 +52,18 @@ function Sidebar() {
 
   return (
     <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: drawerWidth,
-          boxSizing: "border-box",
-          backgroundColor: "#0f172a",
-          color: "#ffffff",
-        },
-      }}
-    >
+  variant="permanent"
+  sx={{
+    width: drawerWidth,
+    flexShrink: 0,
+    "& .MuiDrawer-paper": {
+      width: drawerWidth,
+      boxSizing: "border-box",
+      backgroundColor: "#0f172a",
+      color: "#ffffff",
+    },
+  }}
+>
       <Box sx={{ p: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
           CloudOps
@@ -73,7 +73,6 @@ function Sidebar() {
           variant="body2"
           sx={{ color: "#94a3b8", mt: 0.5 }}
         >
-          DevOps Dashboard
         </Typography>
       </Box>
 
