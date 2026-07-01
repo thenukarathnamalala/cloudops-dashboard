@@ -7,6 +7,7 @@ import healthRoutes from "./modules/health/routes/health.routes";
 import applicationRoutes from "./modules/applications/routes/application.routes";
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware";
 import deploymentRoutes from "./modules/deployments/routes/deployment.routes";
+import monitoringRoutes from "./modules/monitoring/routes/monitoring.routes";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(morgan("dev"));
 app.use("/api", healthRoutes);
 app.use("/api", applicationRoutes);
 app.use("/api/deployments", deploymentRoutes);
+app.use("/api", monitoringRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
