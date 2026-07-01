@@ -17,3 +17,9 @@ const applications: Application[] = [
 export const getApplications = (): Application[] => {
   return applications;
 };
+
+export const getApplicationById = (
+  id: string
+): Application | undefined => {
+  return applications.find((application) => application.id === id);
+};
