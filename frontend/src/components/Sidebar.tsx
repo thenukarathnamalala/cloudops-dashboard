@@ -3,6 +3,7 @@ import AppsIcon from "@mui/icons-material/Apps";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import MonitorHeartIcon from "@mui/icons-material/MonitorHeart";
 import SettingsIcon from "@mui/icons-material/Settings";
+
 import {
   Box,
   Divider,
@@ -14,15 +15,39 @@ import {
   Typography,
 } from "@mui/material";
 
+import { Link, useLocation } from "react-router-dom";
+
 const drawerWidth = 260;
 
 function Sidebar() {
+  const location = useLocation();
+
   const menuItems = [
-    { text: "Dashboard", icon: <DashboardIcon /> },
-    { text: "Applications", icon: <AppsIcon /> },
-    { text: "Deployments", icon: <RocketLaunchIcon /> },
-    { text: "Monitoring", icon: <MonitorHeartIcon /> },
-    { text: "Settings", icon: <SettingsIcon /> },
+    {
+      text: "Dashboard",
+      icon: <DashboardIcon />,
+      path: "/",
+    },
+    {
+      text: "Applications",
+      icon: <AppsIcon />,
+      path: "/applications",
+    },
+    {
+      text: "Deployments",
+      icon: <RocketLaunchIcon />,
+      path: "/deployments",
+    },
+    {
+      text: "Monitoring",
+      icon: <MonitorHeartIcon />,
+      path: "/monitoring",
+    },
+    {
+      text: "Settings",
+      icon: <SettingsIcon />,
+      path: "/settings",
+    },
   ];
 
   return (
@@ -43,7 +68,11 @@ function Sidebar() {
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
           CloudOps
         </Typography>
-        <Typography variant="body2" sx={{ color: "#94a3b8", mt: 0.5 }}>
+
+        <Typography
+          variant="body2"
+          sx={{ color: "#94a3b8", mt: 0.5 }}
+        >
           DevOps Dashboard
         </Typography>
       </Box>
@@ -54,19 +83,38 @@ function Sidebar() {
         {menuItems.map((item) => (
           <ListItemButton
             key={item.text}
+            component={Link}
+            to={item.path}
+            selected={location.pathname === item.path}
             sx={{
               borderRadius: 2,
               mb: 1,
               color: "#cbd5e1",
+
+              "&.Mui-selected": {
+                backgroundColor: "#1e293b",
+                color: "#ffffff",
+              },
+
+              "&.Mui-selected:hover": {
+                backgroundColor: "#334155",
+              },
+
               "&:hover": {
                 backgroundColor: "#1e293b",
                 color: "#ffffff",
               },
             }}
           >
-            <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+            <ListItemIcon
+              sx={{
+                color: "inherit",
+                minWidth: 40,
+              }}
+            >
               {item.icon}
             </ListItemIcon>
+
             <ListItemText primary={item.text} />
           </ListItemButton>
         ))}
