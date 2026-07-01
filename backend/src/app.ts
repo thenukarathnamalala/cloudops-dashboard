@@ -8,6 +8,7 @@ import applicationRoutes from "./modules/applications/routes/application.routes"
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware";
 import deploymentRoutes from "./modules/deployments/routes/deployment.routes";
 import monitoringRoutes from "./modules/monitoring/routes/monitoring.routes";
+import dashboardRoutes from "./modules/dashboard/routes/dashboard.routes";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api", healthRoutes);
 app.use("/api", applicationRoutes);
 app.use("/api/deployments", deploymentRoutes);
 app.use("/api", monitoringRoutes);
+app.use("/api", dashboardRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
