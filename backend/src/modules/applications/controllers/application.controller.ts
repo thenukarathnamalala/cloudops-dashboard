@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import {
+  createApplication,
   getApplications,
   getApplicationById,
 } from "../services/application.service";
@@ -13,10 +14,7 @@ export const getAllApplications = (_req: Request, res: Response): void => {
   });
 };
 
-export const getApplication = (
-  req: Request<{ id: string }>,
-  res: Response
-): void => {
+export const getApplication = (req: Request<{ id: string }>, res: Response): void => {
   const application = getApplicationById(req.params.id);
 
   if (!application) {
@@ -29,6 +27,16 @@ export const getApplication = (
 
   res.status(200).json({
     status: "success",
+    data: application,
+  });
+};
+
+export const addApplication = (req: Request, res: Response): void => {
+  const application = createApplication(req.body);
+
+  res.status(201).json({
+    status: "success",
+    message: "Application created successfully",
     data: application,
   });
 };

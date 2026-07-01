@@ -1,4 +1,4 @@
-import { Application } from "../models/application.model";
+import { Application, CreateApplicationInput } from "../models/application.model";
 
 const applications: Application[] = [
   {
@@ -18,8 +18,21 @@ export const getApplications = (): Application[] => {
   return applications;
 };
 
-export const getApplicationById = (
-  id: string
-): Application | undefined => {
+export const getApplicationById = (id: string): Application | undefined => {
   return applications.find((application) => application.id === id);
+};
+
+export const createApplication = (input: CreateApplicationInput): Application => {
+  const now = new Date().toISOString();
+
+  const newApplication: Application = {
+    id: String(applications.length + 1),
+    ...input,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  applications.push(newApplication);
+
+  return newApplication;
 };

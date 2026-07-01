@@ -13,3 +13,12 @@ export interface Application {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateApplicationInput {
+  name: string;
+  description: string;
+  environment: ApplicationEnvironment;
+  status: ApplicationStatus;
+  version: string;
+  owner: string;
+}
