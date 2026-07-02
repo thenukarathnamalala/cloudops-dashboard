@@ -4,6 +4,6 @@ export interface Deployment {
   version: string;
   environment: "development" | "staging" | "production";
   replicas: number;
-  status: "running" | "pending" | "failed";
+  status: "running" | "deploying" | "failed";
   createdAt: string;
 }

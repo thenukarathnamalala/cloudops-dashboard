@@ -6,11 +6,11 @@ import {
   getDeployments,
 } from "../services/deployment.service";
 
-export const getAllDeployments = (
+export const getAllDeployments = async (
   _req: Request,
   res: Response
-): void => {
-  const deployments = getDeployments();
+): Promise<void> => {
+  const deployments = await getDeployments();
 
   res.status(200).json({
     status: "success",
@@ -18,11 +18,11 @@ export const getAllDeployments = (
   });
 };
 
-export const getDeployment = (
+export const getDeployment = async (
   req: Request<{ id: string }>,
   res: Response
-): void => {
-  const deployment = getDeploymentById(req.params.id);
+): Promise<void> => {
+  const deployment = await getDeploymentById(req.params.id);
 
   if (!deployment) {
     res.status(404).json({
@@ -38,24 +38,35 @@ export const getDeployment = (
   });
 };
 
-export const addDeployment = (
+export const addDeployment = async (
   req: Request,
   res: Response
-): void => {
-  const deployment = createDeployment(req.body);
+): Promise<void> => {
+  try {
+    console.log("Request Body:", req.body);
 
-  res.status(201).json({
-    status: "success",
-    message: "Deployment created successfully",
-    data: deployment,
-  });
+    const deployment = await createDeployment(req.body);
+
+    res.status(201).json({
+      status: "success",
+      message: "Deployment created successfully",
+      data: deployment,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+    });
+  }
 };
 
-export const removeDeployment = (
+export const removeDeployment = async (
   req: Request<{ id: string }>,
   res: Response
-): void => {
-  const deleted = deleteDeployment(req.params.id);
+): Promise<void> => {
+  const deleted = await deleteDeployment(req.params.id);
 
   if (!deleted) {
     res.status(404).json({

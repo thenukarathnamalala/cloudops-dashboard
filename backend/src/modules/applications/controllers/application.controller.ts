@@ -6,8 +6,11 @@ import {
   deleteApplication,
 } from "../services/application.service";
 
-export const getAllApplications = (_req: Request, res: Response): void => {
-  const applications = getApplications();
+export const getAllApplications = async (
+  _req: Request,
+  res: Response
+): Promise<void> => {
+  const applications = await getApplications();
 
   res.status(200).json({
     status: "success",
@@ -15,8 +18,11 @@ export const getAllApplications = (_req: Request, res: Response): void => {
   });
 };
 
-export const getApplication = (req: Request<{ id: string }>, res: Response): void => {
-  const application = getApplicationById(req.params.id);
+export const getApplication = async (
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> => {
+  const application = await getApplicationById(req.params.id);
 
   if (!application) {
     res.status(404).json({
@@ -32,18 +38,35 @@ export const getApplication = (req: Request<{ id: string }>, res: Response): voi
   });
 };
 
-export const addApplication = (req: Request, res: Response): void => {
-  const application = createApplication(req.body);
+export const addApplication = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    console.log("Request Body:", req.body);
 
-  res.status(201).json({
-    status: "success",
-    message: "Application created successfully",
-    data: application,
-  });
+    const application = await createApplication(req.body);
+
+    res.status(201).json({
+      status: "success",
+      message: "Application created successfully",
+      data: application,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      status: "error",
+      message: "Internal Server Error",
+    });
+  }
 };
 
-export const removeApplication = (req: Request<{ id: string }>, res: Response): void => {
-  const deleted = deleteApplication(req.params.id);
+export const removeApplication = async (
+  req: Request<{ id: string }>,
+  res: Response
+): Promise<void> => {
+  const deleted = await deleteApplication(req.params.id);
 
   if (!deleted) {
     res.status(404).json({

@@ -1,50 +1,45 @@
-import { Application, CreateApplicationInput } from "../models/application.model";
+import prisma from "../../../config/prisma";
+import { CreateApplicationInput } from "../models/application.model";
 
-const applications: Application[] = [
-  {
-    id: "1",
-    name: "CloudOps API",
-    description: "Backend API service",
-    environment: "production",
-    status: "healthy",
-    version: "1.0.0",
-    owner: "Thenuka",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
-
-export const getApplications = (): Application[] => {
-  return applications;
+export const getApplications = async () => {
+  return await prisma.application.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 };
 
-export const getApplicationById = (id: string): Application | undefined => {
-  return applications.find((application) => application.id === id);
+export const getApplicationById = async (id: string) => {
+  return await prisma.application.findUnique({
+    where: {
+      id,
+    },
+  });
 };
 
-export const createApplication = (input: CreateApplicationInput): Application => {
-  const now = new Date().toISOString();
-
-  const newApplication: Application = {
-    id: String(applications.length + 1),
-    ...input,
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  applications.push(newApplication);
-
-  return newApplication;
+export const createApplication = async (input: CreateApplicationInput) => {
+  return await prisma.application.create({
+    data: {
+      name: input.name,
+      description: input.description,
+      environment: input.environment,
+      status: input.status,
+      version: input.version,
+      owner: input.owner,
+    },
+  });
 };
 
-export const deleteApplication = (id: string): boolean => {
-  const applicationIndex = applications.findIndex((application) => application.id === id);
+export const deleteApplication = async (id: string) => {
+  try {
+    await prisma.application.delete({
+      where: {
+        id,
+      },
+    });
 
-  if (applicationIndex === -1) {
+    return true;
+  } catch {
     return false;
   }
-
-  applications.splice(applicationIndex, 1);
-
-  return true;
 };

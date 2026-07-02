@@ -20,12 +20,14 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import RestoreIcon from "@mui/icons-material/Restore";
 
+import AddDeploymentDialog from "../components/AddDeploymentDialog";
 import { getDeployments } from "../api/deploymentApi";
 import type { Deployment } from "../types/deployment";
 
 function DeploymentsPage() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const loadDeployments = () => {
     setLoading(true);
@@ -62,7 +64,11 @@ function DeploymentsPage() {
             Refresh
           </Button>
 
-          <Button variant="contained" startIcon={<AddIcon />}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setAddDialogOpen(true)}
+          >
             New Deployment
           </Button>
         </Box>
@@ -88,18 +94,22 @@ function DeploymentsPage() {
               {deployments.map((deployment) => (
                 <TableRow key={deployment.id}>
                   <TableCell>{deployment.applicationName}</TableCell>
+
                   <TableCell>{deployment.version}</TableCell>
+
                   <TableCell sx={{ textTransform: "capitalize" }}>
                     {deployment.environment}
                   </TableCell>
+
                   <TableCell>{deployment.replicas}</TableCell>
+
                   <TableCell>
                     <Chip
                       label={deployment.status}
                       color={
                         deployment.status === "running"
                           ? "success"
-                          : deployment.status === "pending"
+                          : deployment.status === "deploying"
                           ? "warning"
                           : "error"
                       }
@@ -146,6 +156,12 @@ function DeploymentsPage() {
           </Table>
         </TableContainer>
       )}
+
+      <AddDeploymentDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onSuccess={loadDeployments}
+      />
     </Box>
   );
 }
