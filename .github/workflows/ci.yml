@@ -1,96 +1,89 @@
-name: CloudOps CI
+name: CloudOps CI/CD
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  backend:
-    name: Backend Build
+  build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Application Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+      
+      # Docker Login
 
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Build backend
-        run: npm run build
-
-  frontend:
-    name: Frontend Build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
-
-  docker:
-    name: Build and Push Docker Images
-    runs-on: ubuntu-latest
-    needs:
-      - backend
-      - frontend
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build and push backend image
+      
+      # Backend Image
+
+      - name: Build Backend
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           push: true
           tags: |
-            thenu8175/cloudops-dashboard-backend:latest
             thenu8175/cloudops-dashboard-backend:${{ github.sha }}
+            thenu8175/cloudops-dashboard-backend:latest
 
-      - name: Build and push frontend image
+            
+      # Frontend Image
+
+      - name: Build Frontend
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
           push: true
           tags: |
-            thenu8175/cloudops-dashboard-frontend:latest
             thenu8175/cloudops-dashboard-frontend:${{ github.sha }}
+            thenu8175/cloudops-dashboard-frontend:latest
+
+    
+      # Clone GitOps Repository
+
+      - name: Clone GitOps Repository
+        run: |
+          git clone https://${{ secrets.GITOPS_USERNAME }}:${{ secrets.GITOPS_TOKEN }}@github.com/${{ secrets.GITOPS_USERNAME }}/cloudops-dashboard-gitops.git
+
+    
+      # Update Backend Image
+      
+      - name: Update Backend Image
+        run: |
+          sed -i "s|image: thenu8175/cloudops-dashboard-backend:.*|image: thenu8175/cloudops-dashboard-backend:${{ github.sha }}|" cloudops-dashboard-gitops/k8s/backend/backend.yaml
+
+      
+      # Update Frontend Image
+      
+      - name: Update Frontend Image
+        run: |
+          sed -i "s|image: thenu8175/cloudops-dashboard-frontend:.*|image: thenu8175/cloudops-dashboard-frontend:${{ github.sha }}|" cloudops-dashboard-gitops/k8s/frontend/frontend.yaml
+
+      
+      # Commit Changes
+      
+      - name: Commit Changes
+        run: |
+          cd cloudops-dashboard-gitops
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add .
+
+          git diff --cached --quiet || git commit -m "Update images to ${{ github.sha }}"
+
+          git push
