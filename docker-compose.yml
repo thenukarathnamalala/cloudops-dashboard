@@ -1,19 +1,13 @@
-version: "3.9"
-
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: thenu8175/cloudops-dashboard-backend:latest
     container_name: cloudops-backend
     ports:
       - "5000:5000"
     restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: thenu8175/cloudops-dashboard-frontend:latest
     container_name: cloudops-frontend
     ports:
       - "3000:80"
