@@ -4,45 +4,34 @@ services:
   postgres:
     image: postgres:17-alpine
     container_name: cloudops-postgres
-
     environment:
       POSTGRES_DB: cloudops_db
       POSTGRES_USER: cloudops
       POSTGRES_PASSWORD: cloudops
-
     ports:
       - "5432:5432"
-
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
     restart: unless-stopped
 
   backend:
     image: thenu8175/cloudops-dashboard-backend:latest
     container_name: cloudops-backend
-
     depends_on:
       - postgres
-
     environment:
       DATABASE_URL: postgresql://cloudops:cloudops@postgres:5432/cloudops_db
-
     ports:
       - "5000:5000"
-
     restart: unless-stopped
 
   frontend:
     image: thenu8175/cloudops-dashboard-frontend:latest
     container_name: cloudops-frontend
-
     depends_on:
       - backend
-
     ports:
       - "3000:80"
-
     restart: unless-stopped
 
 volumes:
