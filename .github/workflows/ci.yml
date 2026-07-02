@@ -39,7 +39,7 @@ jobs:
             thenu8175/cloudops-dashboard-backend:${{ github.sha }}
             thenu8175/cloudops-dashboard-backend:latest
 
-            
+
       # Frontend Image
 
       - name: Build Frontend
@@ -74,7 +74,7 @@ jobs:
 
       
       # Commit Changes
-      
+      ####
       - name: Commit Changes
         run: |
           cd cloudops-dashboard-gitops
