@@ -6,7 +6,6 @@ export const getDashboardSummary = async (): Promise<DashboardSummary> => {
   const monitoring = await getMonitoringMetrics();
 
   const totalApplications = await prisma.application.count();
-
   const totalDeployments = await prisma.deployment.count();
 
   return {
