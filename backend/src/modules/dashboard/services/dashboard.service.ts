@@ -1,27 +1,20 @@
 import prisma from "../../../config/prisma";
-
-import { DashboardSummary } from "../models/dashboard.model";
 import { getMonitoringMetrics } from "../../monitoring/services/monitoring.service";
+import { DashboardSummary } from "../models/dashboard.model";
 
 export const getDashboardSummary = async (): Promise<DashboardSummary> => {
-  const monitoring = getMonitoringMetrics();
+  const monitoring = await getMonitoringMetrics();
 
   const totalApplications = await prisma.application.count();
 
   const totalDeployments = await prisma.deployment.count();
-
-  const healthyServices = await prisma.application.count({
-    where: {
-      status: "healthy",
-    },
-  });
 
   return {
     totalApplications,
     totalDeployments,
     cpuUsage: monitoring.cpuUsage,
     memoryUsage: monitoring.memoryUsage,
-    healthyServices,
+    healthyServices: monitoring.healthyServices,
     runningPods: monitoring.runningPods,
   };
 };
