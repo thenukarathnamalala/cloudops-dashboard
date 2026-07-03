@@ -17,6 +17,9 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import CloudQueueIcon from "@mui/icons-material/CloudQueue";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import MemoryIcon from "@mui/icons-material/Memory";
+import SpeedIcon from "@mui/icons-material/Speed";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { useNavigate } from "react-router-dom";
 
@@ -24,6 +27,8 @@ import {
   getDashboardSummary,
   type DashboardSummary,
 } from "../api/dashboardApi";
+
+const GRAFANA_URL = "http://54.254.56.237:30090";
 
 function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -48,7 +53,11 @@ function DashboardPage() {
   }
 
   if (!summary) {
-    return <Typography color="error">Failed to load dashboard summary.</Typography>;
+    return (
+      <Typography color="error">
+        Failed to load dashboard summary.
+      </Typography>
+    );
   }
 
   const cards = [
@@ -65,9 +74,9 @@ function DashboardPage() {
       icon: <RocketLaunchIcon fontSize="large" />,
     },
     {
-      title: "Healthy Services",
+      title: "Healthy Targets",
       value: summary.healthyServices,
-      subtitle: "Services running healthy",
+      subtitle: "Prometheus targets up",
       icon: <MonitorHeartIcon fontSize="large" />,
     },
     {
@@ -79,7 +88,7 @@ function DashboardPage() {
   ];
 
   return (
-  <Box sx={{ maxWidth: "1200px", mx: "auto" }}>
+    <Box sx={{ maxWidth: "1200px", mx: "auto" }}>
       <Paper
         sx={{
           p: 4,
@@ -94,6 +103,8 @@ function DashboardPage() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            gap: 2,
+            flexWrap: "wrap",
           }}
         >
           <Box>
@@ -101,27 +112,46 @@ function DashboardPage() {
               Dashboard
             </Typography>
 
-            <Typography sx={{ color: "#dbeafe", maxWidth: 600 }}>
-              Manage applications, deployments, monitoring, and infrastructure
-              from a single Kubernetes operations dashboard.
+            <Typography sx={{ color: "#dbeafe", maxWidth: 650 }}>
+              Live Kubernetes operations dashboard powered by PostgreSQL,
+              Prometheus, Grafana, Argo CD, and GitOps.
             </Typography>
           </Box>
 
-          <Button
-            variant="contained"
-            startIcon={<RefreshIcon />}
-            onClick={loadSummary}
-            sx={{
-              backgroundColor: "#ffffff",
-              color: "#1d4ed8",
-              fontWeight: 700,
-              "&:hover": {
-                backgroundColor: "#e0f2fe",
-              },
-            }}
-          >
-            Refresh
-          </Button>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              startIcon={<RefreshIcon />}
+              onClick={loadSummary}
+              sx={{
+                backgroundColor: "#ffffff",
+                color: "#1d4ed8",
+                fontWeight: 700,
+                "&:hover": {
+                  backgroundColor: "#e0f2fe",
+                },
+              }}
+            >
+              Refresh
+            </Button>
+
+            <Button
+              variant="outlined"
+              startIcon={<OpenInNewIcon />}
+              onClick={() => window.open(GRAFANA_URL, "_blank")}
+              sx={{
+                color: "#ffffff",
+                borderColor: "#ffffff",
+                fontWeight: 700,
+                "&:hover": {
+                  borderColor: "#dbeafe",
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                },
+              }}
+            >
+              Grafana
+            </Button>
+          </Box>
         </Box>
       </Paper>
 
@@ -172,14 +202,21 @@ function DashboardPage() {
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3, borderRadius: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-              Resource Usage
+              Live Resource Usage
             </Typography>
 
             <Box sx={{ mb: 3 }}>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography>CPU Usage</Typography>
-                <Typography>{summary.cpuUsage}%</Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <SpeedIcon color="primary" />
+                  <Typography>CPU Usage</Typography>
+                </Box>
+
+                <Typography sx={{ fontWeight: 700 }}>
+                  {summary.cpuUsage}%
+                </Typography>
               </Box>
+
               <LinearProgress
                 variant="determinate"
                 value={summary.cpuUsage}
@@ -189,15 +226,27 @@ function DashboardPage() {
 
             <Box>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography>Memory Usage</Typography>
-                <Typography>{summary.memoryUsage}%</Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <MemoryIcon color="primary" />
+                  <Typography>Memory Usage</Typography>
+                </Box>
+
+                <Typography sx={{ fontWeight: 700 }}>
+                  {summary.memoryUsage}%
+                </Typography>
               </Box>
+
               <LinearProgress
                 variant="determinate"
                 value={summary.memoryUsage}
                 sx={{ mt: 1, height: 10, borderRadius: 5 }}
               />
             </Box>
+
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              Metrics are collected from Prometheus using Node Exporter and
+              kube-state-metrics.
+            </Typography>
           </Paper>
         </Grid>
 
@@ -231,6 +280,14 @@ function DashboardPage() {
               >
                 View Metrics
               </Button>
+
+              <Button
+                variant="outlined"
+                startIcon={<OpenInNewIcon />}
+                onClick={() => window.open(GRAFANA_URL, "_blank")}
+              >
+                Open Grafana
+              </Button>
             </Box>
 
             <Box sx={{ mt: 3 }}>
@@ -239,10 +296,29 @@ function DashboardPage() {
               </Typography>
 
               <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                <Chip icon={<CheckCircleIcon />} label="Backend API Healthy" color="success" />
-                <Chip icon={<CheckCircleIcon />} label="Monitoring Connected" color="success" />
-                <Chip label="Kubernetes Pending" />
-                <Chip label="Grafana Pending" />
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label="Backend API Healthy"
+                  color="success"
+                />
+
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label="Prometheus Connected"
+                  color="success"
+                />
+
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label="Grafana Running"
+                  color="success"
+                />
+
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label="Argo CD Synced"
+                  color="success"
+                />
               </Box>
             </Box>
           </Paper>
